@@ -335,3 +335,9 @@ function loadLocaleData(locale) {
 }
 ```
 
+## References
+
+1. [Localizing your react app](https://blog.idagio.com/localizing-your-react-app-the-right-way-a51ca600c430)
+2. [React app with react-intl + Example](https://www.codeandweb.com/babeledit/tutorials/how-to-translate-your-react-app-with-react-intl)
+3. [How to Internationalize (i18n) React 16+ App with react-intl Package](https://www.positronx.io/how-to-internationalize-i18n-react-app-with-react-intl-package/)
+4. [Help wanted Using react-intl](https://github.com/facebook/create-react-app/issues/1227#issuecomment-266202754)
