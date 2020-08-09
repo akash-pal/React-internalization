@@ -14,8 +14,6 @@ function loadLocaleData(locale) {
   }
 }
 
-//https://www.positronx.io/how-to-internationalize-i18n-react-app-with-react-intl-package/
-
 function MainApp(props) {
   return (
     <IntlProvider
