@@ -1,0 +1,12 @@
+{
+  "userName": [
+    {
+      "type": 0,
+      "value": "My french name is "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ]
+}

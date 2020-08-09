@@ -1,0 +1,6 @@
+{
+  "userName": {
+    "defaultMessage": "My name is {name}",
+    "description": "User name"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "userName": {
+    "defaultMessage": "My french name is {name}",
+    "description": "User name"
+  }
+}

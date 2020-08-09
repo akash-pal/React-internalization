@@ -3,15 +3,41 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { IntlProvider } from "react-intl";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+function loadLocaleData(locale) {
+  switch (locale) {
+    case 'fr':
+      return import('./compiled-lang/fr.json');
+    default:
+      return import('./compiled-lang/en.json');
+  }
+}
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
+//https://www.positronx.io/how-to-internationalize-i18n-react-app-with-react-intl-package/
+
+function MainApp(props) {
+  return (
+    <IntlProvider
+      locale={props.locale}
+      defaultLocale="en"
+      messages={props.messages}
+    >
+      <App />
+    </IntlProvider>
+  );
+}
+
+async function bootstrapApplication(locale, mainDiv) {
+  const messages = await loadLocaleData(locale); 
+  ReactDOM.render(
+    <React.StrictMode>
+      <MainApp locale={locale} messages={messages.default} />
+    </React.StrictMode>,
+    mainDiv);
+}
+
+const language = navigator.language.split(/[-_]/)[0];
+bootstrapApplication(language , document.getElementById('root'))
+
 serviceWorker.unregister();
