@@ -1,68 +1,337 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## React Internalization 
 
-## Available Scripts
+The ability to use a system across different locals based on the region.
 
-In the project directory, you can run:
+According to [W3C](https://www.w3.org/International/questions/qa-i18n):
 
-### `yarn start`
+>**Internalization** is the design and development of a product, application or document content that enables easy **localization** for target audiences that vary in culture, region or language. 
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+>Internationalization is often written in English as **i18n**, where 18 is the number of letters between i and n in the English word.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+>Localization is sometimes written in English as **l10n**, where 10 is the number of letters in the English word between l and n
 
-### `yarn test`
+```
+    const now = new Date();
+    <span>{now}</span>
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    //Internalization
+    <span>{formatDate(now)}</span>
 
-### `yarn build`
+    //Localization
+    const dateFormats = {
+        cs: 'YYYY-MM-DD',
+        en: 'YYYY-DD-MM'
+    }
+    <span>{formatDate(now, dateFormats['cs']}</span>
+```
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Translation using React-intl
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Translations work with plain text only not code.
+So the translations with variables needs to be formatted and split into String template and runtime data.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`<span>Hello {name}</span>`
 
-### `yarn eject`
+The String template goes to translator and runtime data remains in code. This is achieved by the Standard ICU (International Components For Unicode) Message Format.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Types of formatting
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. Variables:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+    Hello {name}<br/>
+    Hello John
 
-## Learn More
+2. Date/Number formatting:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   Today is {now, date}<br/>
+   Today is 9th August 2020
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. Formatting Options:
 
-### Code Splitting
+    Interest rate is {rate, number, percent}<br/>
+    Interest rate is 5%
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+4. Pluralization:
+    
+    {count, plural, one {# book} other {# books}}<br/>
+    1 book, 2 books
 
-### Analyzing the Bundle Size
+## Steps in translation
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+1. Message Declaration
+2. Message Extraction
+3. Make Catalog
+4. Compiling Messages
+5. Message Distribution 
 
-### Making a Progressive Web App
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+## Message Declaration
 
-### Advanced Configuration
+**There are three ways to declare messages:**
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+1. Using imperative API `intl.formatMessage`
 
-### Deployment
+    ```
+    // Method must be exactly `intl.formatMessage`
+    intl.formatMessage(
+    {
+        description: 'A message', // Description should be a string literal
+        defaultMessage: 'My name is {name}', // Message should be a string literal
+    },
+    {
+        name: userName,
+    } // Values should be an object literal, but not necessarily every value inside
+    );
+    ```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+2. Using React API `<FormattedMessage/>`
 
-### `yarn build` fails to minify
+    ```
+    import {FormattedMessage} from 'react-intl';
+    <FormattedMessage
+        description="A message" // Description should be a string literal
+        defaultMessage="My name is {name}" // Message should be a string literal
+        values={
+            {
+            name: userName,
+            } // Values should be an object literal, but not necessarily every value inside
+        }
+    />;
+    ```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+3. Pre-declaring using `defineMessage` for later consumption (less recommended)
+
+    ```
+    import {defineMessage} from 'react-intl';
+    const message = defineMessage({
+        description: 'A message', // Description should be a string literal
+        defaultMessage: 'My name is {name}', // Message should be a string literal
+    });
+
+    intl.formatMessage(message, {name: 'John'}); // My name is John
+
+    <FormattedMessage
+        {...message}
+        values={{
+            name: 'John',
+        }}
+    />; // My name is John
+    ```
+
+
+## Message Extraction
+
+**It is the process of extracting all messages that have een declared into a single json file.**
+
+For the purpose of extracting the messages there are two options:
+
+1. [Formatjs ](https://formatjs.io/docs/getting-started/message-extraction).
+
+    **Installation**
+
+    `npm install formatjs`
+
+    **Usage**
+
+    Add the below script to `package.json`
+
+    ```
+    {
+        "scripts": {
+            "extract-messages": "formatjs extract \"src/**/*.js*\" --out-file src/lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+        }
+    }
+    ```
+
+    `--out-file [path]`<br/>
+    The target file path where the plugin will output an aggregated .json file of all the translations from the files supplied. This flag will ignore --messages-dir
+
+    It extracts the messages to `lang` folder inside the `src` folder.
+
+    `--id-interpolation-pattern [pattern]`<br/>
+    If certain message descriptors don't have id, this pattern will be used to automatically generate IDs for them. Default to [contenthash:5]. 
+
+
+    **Example output:**
+
+    ```
+    {
+        "userName": {
+            "defaultMessage": "My name is {name}",
+            "description": "User name"
+        }
+    }
+    ```
+
+2. [babel-plugin-react-intl](https://formatjs.io/docs/tooling/babel-plugin)
+
+    **Installation**
+
+    `npm install babel-plugin-react-intl`
+
+    **Usage**
+
+    Create a `.babelrc` file with the below content:
+
+    ```
+    {
+        "presets": ["react-app"],
+        "plugins": [
+            [ "react-intl", {
+                "messagesDir": "./build/messages",
+                "extractSourceLocation": true
+            }]
+        ]
+    }
+    ```
+
+    Add the below script to `package.json`
+
+    ```
+    "scripts": {
+        "babel-extract-messages": "NODE_ENV=production babel ./src  --out-file /dev/null"    (Mac/Linux)
+        "babel-extract-messages": "set NODE_ENV=production&& babel ./src >NUL"               (Windows)
+    }
+    ```
+
+    **Example output:**
+
+    ```
+    [
+        {
+            "id": "userName",
+            "description": "User name",
+            "defaultMessage": "My name is {name}",
+            "file": "src\\App.js",
+            "start": {
+                "line": 7,
+                "column": 8
+            },
+            "end": {
+                "line": 12,
+                "column": 10
+            }
+        }
+    ]
+    ```
+
+
+
+## Make Catalog
+
+The extracted message from the previous step is sent to a TMS (Translation Management System) to generate different translated locals.
+
+This can be achieved with any of the Translation Vendors.
+
+**Example of `fr.json`**
+
+```
+{
+  "userName": {
+    "defaultMessage": "Mon nom est {name}",
+    "description": "User name"
+  }
+}
+```
+
+## Compiling Messages
+
+The translated messages are then process to react intl format.
+
+**Installation**
+
+`npm install formatjs`
+
+**Usage**
+
+Add the below script to `package.json`
+
+```
+{
+    "scripts": {
+        "compile-messages": "gulp compile-messages"
+    }
+}
+```
+
+The below command compiles a single file:
+```
+npm run compile -- lang/fr.json --ast --out-file compiled-lang/fr.json
+```
+
+The `gulpfile.js` compiles all the files from `lang` folder to `compiled-lang` folder.
+
+```
+gulp.task('compile-messages', async function () {
+    const directoryPath = path.join(__dirname, sourcePath);
+    //passsing directoryPath and callback function
+    fs.readdir(directoryPath, function (err, files) {
+        //handling error
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+        //listing all files using forEach
+        files.forEach(function (file) {
+            // Do whatever you want to do with the file
+            return gulp.src(path.join(sourcePath, file))
+            .pipe(run(`formatjs compile ${sourcePath}/${file} --ast --out-file ${destPath}/${file}`))
+        });
+    });
+});
+```
+
+**Compiled `fr.json`**
+```
+{
+  "userName": [
+    {
+      "type": 0,
+      "value": "Mon nom est "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ]
+}
+```
+
+# Message Distribution 
+
+Below is the projected structure followed:
+
+```
+projectRoot
+|-- src
+|   |-- App.js
+|   |-- lang
+|   |   |-- en-US.json
+|   |   |-- fr.json
+|   |-- compiled-lang
+|   |   |-- en-US.json
+|   |   |-- fr.json
+|-- package.json
+|-- .eslintrc.js
+```
+
+The current local is decided based on the browser locale:
+
+```
+const language = navigator.language.split(/[-_]/)[0];
+// en
+```
+
+Dynamic import is used to load the specific compiled-lang file based on the language:
+
+```
+function loadLocaleData(locale) {
+  switch (locale) {
+    case 'fr':
+      return import('./compiled-lang/fr.json');
+    default:
+      return import('./compiled-lang/en.json');
+  }
+}
+```
+
