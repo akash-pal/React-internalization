@@ -227,6 +227,9 @@ The extracted message from the previous step is sent to a TMS (Translation Manag
 
 This can be achieved with any of the Translation Vendors.
 
+For integration with Google Translate API:
+[react-intl-auto-translate](https://github.com/tmkasun/react-intl-auto-translate)
+
 **Example of `fr.json`**
 
 ```
