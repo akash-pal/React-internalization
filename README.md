@@ -123,7 +123,6 @@ The String template goes to translator and runtime data remains in code. This is
     />
     ```
 
-
 ## Message Extraction
 
 **It is the process of extracting all messages that have een declared into a single json file.**
@@ -338,6 +337,8 @@ function loadLocaleData(locale) {
   }
 }
 ```
+
+![Demo](./docs/images/ReactInternalization.gif)
 
 ## References
 
