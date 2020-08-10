@@ -1,5 +1,25 @@
 {
-  "userName": [
+  "user.designation": [
+    {
+      "type": 0,
+      "value": "Ma désignation est "
+    },
+    {
+      "type": 1,
+      "value": "designation"
+    }
+  ],
+  "user.location": [
+    {
+      "type": 0,
+      "value": "Mon emplacement est "
+    },
+    {
+      "type": 1,
+      "value": "place"
+    }
+  ],
+  "user.userName": [
     {
       "type": 0,
       "value": "Mon nom est "

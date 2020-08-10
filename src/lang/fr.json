@@ -1,5 +1,13 @@
 {
-  "userName": {
+  "user.designation": {
+    "defaultMessage": "Ma désignation est {designation}",
+    "description": "Designation"
+  },
+  "user.location": {
+    "defaultMessage": "Mon emplacement est {place}",
+    "description": "Location"
+  },
+  "user.userName": {
     "defaultMessage": "Mon nom est {name}",
     "description": "User name"
   }
