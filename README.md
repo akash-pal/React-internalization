@@ -73,50 +73,54 @@ The String template goes to translator and runtime data remains in code. This is
 1. Using imperative API `intl.formatMessage`
 
     ```
-    // Method must be exactly `intl.formatMessage`
-    intl.formatMessage(
+    import {injectIntl} from 'react-intl';
+
     {
-        description: 'A message', // Description should be a string literal
-        defaultMessage: 'My name is {name}', // Message should be a string literal
-    },
-    {
-        name: userName,
-    } // Values should be an object literal, but not necessarily every value inside
-    );
+        intl.formatMessage(
+            {
+                id: "user.designation",
+                description: 'Designation',
+                defaultMessage: 'My designation is {designation}',
+            },
+            {
+                designation: 'Software Developer',
+            }
+        )
+    }
     ```
 
 2. Using React API `<FormattedMessage/>`
 
     ```
     import {FormattedMessage} from 'react-intl';
+
     <FormattedMessage
-        description="A message" // Description should be a string literal
-        defaultMessage="My name is {name}" // Message should be a string literal
-        values={
-            {
-            name: userName,
-            } // Values should be an object literal, but not necessarily every value inside
-        }
-    />;
+        id="user.userName"
+        description="User name"
+        defaultMessage="My name is {name}"
+        values={{ name: 'Akash' }}
+    />
     ```
 
 3. Pre-declaring using `defineMessage` for later consumption (less recommended)
 
     ```
     import {defineMessage} from 'react-intl';
+
     const message = defineMessage({
-        description: 'A message', // Description should be a string literal
-        defaultMessage: 'My name is {name}', // Message should be a string literal
+        id: 'user.location',
+        description: 'Location',
+        defaultMessage: 'My location is {place}',
     });
 
-    intl.formatMessage(message, {name: 'John'}); // My name is John
+    intl.formatMessage(message, {place: 'India'}); 
 
     <FormattedMessage
         {...message}
         values={{
-            name: 'John',
+            place: 'India',
         }}
-    />; // My name is John
+    />
     ```
 
 
@@ -341,3 +345,4 @@ function loadLocaleData(locale) {
 2. [React app with react-intl + Example](https://www.codeandweb.com/babeledit/tutorials/how-to-translate-your-react-app-with-react-intl)
 3. [How to Internationalize (i18n) React 16+ App with react-intl Package](https://www.positronx.io/how-to-internationalize-i18n-react-app-with-react-intl-package/)
 4. [Help wanted Using react-intl](https://github.com/facebook/create-react-app/issues/1227#issuecomment-266202754)
+5. [How To Use React-Intl: internationalize your React app](https://gist.github.com/eveningkid/6df7d35d1884854a6d9ecaaac89fd2ae)
